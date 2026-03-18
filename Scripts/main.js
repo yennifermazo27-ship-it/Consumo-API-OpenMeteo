@@ -1,44 +1,44 @@
-import {getCoordinates,getWeather} from "./service.js";
-import {showWeather,showError} from "./ui.js";
-import {saveData,getData} from "./persistance.js";
+import { getCoordinates, getWeather } from "./service.js";
+import { showWeather, showError } from "./ui.js";
+import { setLocalStorageValue, getLocalStorageValue } from "./persistance.js";
 
 const form = document.getElementById("form");
 
-form.addEventListener("submit", async (e)=>{
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-e.preventDefault();
+    const city = document.getElementById("city").value;
 
-const city = document.getElementById("city").value;
+    try {
+        const coord = await getCoordinates(city);
 
-try{
+        if (!coord) {
+            showError("Ciudad no encontrada");
+            return;
+        }
 
-const coord = await getCoordinates(city);
+        const weather = await getWeather(coord.latitude, coord.longitude);
 
-if(!coord){
-showError("Ciudad no encontrada");
-return;
-}
+        
+        showWeather(coord.name, weather);
 
-const weather = await getWeather(coord.latitude,coord.longitude);
+      
+        setLocalStorageValue("weatherData", {
+            city: coord.name,
+            weather: weather
+        });
 
-showWeather(coord.name,weather);
-
-saveData({city:coord.name,weather});
-
-}catch(error){
-
-showError("Error al consultar el clima");
-
-}
-
+    } catch (error) {
+        showError("Error al consultar el clima");
+    }
 });
 
-window.addEventListener("load",()=>{
 
-const data = getData();
+window.addEventListener("load", () => {
 
-if(data){
-showWeather(data.city,data.weather);
-}
+    const data = getLocalStorageValue("weatherData");
 
+    if (data) {
+        showWeather(data.city, data.weather);
+    }
 });
