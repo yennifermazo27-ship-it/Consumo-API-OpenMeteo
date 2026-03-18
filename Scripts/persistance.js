@@ -1,7 +1,11 @@
-export function saveData(data){
-localStorage.setItem("weather",JSON.stringify(data));
+export function setLocalStorageValue(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function getData(){
-return JSON.parse(localStorage.getItem("weather"));
+export function getLocalStorageValue(key) {
+    return JSON.parse(localStorage.getItem(key));
+}
+
+export function clearLocalStorage() {
+    localStorage.clear();
 }
